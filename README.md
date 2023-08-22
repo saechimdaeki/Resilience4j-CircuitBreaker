@@ -43,3 +43,67 @@ API 요청 -> 서버A ->(다시 시도 하는 것으로 해결이 안되고) 트
 
     ![image](./image/circuit%20breaker%20example2.png)
 
+
+
+
+### TMI
+
+```yaml
+spring:
+  application.name: circuit-saechim
+
+server:
+  port: 8080
+
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 3
+      waitDuration: 1000
+      retryExceptions:
+        - me.saechimdaeki.circuit.exception.RetryException   # retryExceptions에 지정된 예외는 재시도
+      ignoreExceptions:
+        - me.saechimdaeki.circuit.exception.IgnoreException  # retryExceptions에 지정되지 않은 예외는 ignoreExceptions로 처리됨
+  instances:
+    simpleRetryConfig:
+      baseConfig: default
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 7                                   # 최소 7번까지는 무조건 CLOSE로 가정하고 호출한다..
+      slidingWindowSize: 10                                     # (minimumNumberOfCalls 이후로는) 10개의 요청을 기준으로 판단한다.
+      waitDurationInOpenState: 10s                              # OPEN 상태에서 HALF_OPEN으로 가려면 얼마나 기다릴 것인가
+
+      failureRateThreshold: 40                                  # slidingWindowSize 중 몇 %가 recordException이면 OPEN으로 만들 것인가?
+
+      slowCallDurationThreshold: 3000                           # 몇 ms 동안 요청이 처리되지 않으면 실패로 간주할 것인가?
+      slowCallRateThreshold: 60                                 # slidingWindowSize 중 몇 %가 slowCall이면 OPEN으로 만들 것인가?
+
+      permittedNumberOfCallsInHalfOpenState: 5                  # HALF_OPEN 상태에서 5번까지는 CLOSE로 가기위해 호출한다.
+      automaticTransitionFromOpenToHalfOpenEnabled: true        # OPEN 상태에서 자동으로 HALF_OPEN으로 갈 것인가?
+
+      eventConsumerBufferSize: 10                               # actuator를 위한 이벤트 버퍼 사이즈
+
+      recordExceptions:
+        - me.saechimdaeki.circuit.exception.RecordException
+      ignoreExceptions:
+        - me.saechimdaeki.circuit.exception.IgnoreException
+  instances:
+    simpleCircuitBreakerConfig:
+      baseConfig: default
+
+management.endpoints.web.exposure.include: '*'
+management.endpoint.health.show-details: always
+
+management.health.diskspace.enabled: false
+management.health.circuitbreakers.enabled: true
+
+management.metrics.tags.application: ${spring.application.name}
+management.metrics.distribution.percentiles-histogram.http.server.requests: true
+management.metrics.distribution.percentiles-histogram.resilience4j.circuitbreaker.calls: true
+
+```
+
