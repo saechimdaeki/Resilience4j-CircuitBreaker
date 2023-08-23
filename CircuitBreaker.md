@@ -32,3 +32,35 @@ windowSize는 default가 100
 minimumNumberOfCalls를 두면 해당 갯수를 넘어간 요청부터 윈도우 사이즈의 실패율을 계산한다. default는 100 
 
 `주의할점은 sliding window보다 큰 값으로 지정하면 당연히 의미가 없다 `
+
+#### waitDurationInOpenSate
+
+서킷의 상태가 open으로 바뀐다음 open에 얼마동안 머물러 있을지에 대한 설정
+
+![image](image/waitDurationInOpenSate.png)
+
+#### permittedNumberOfCallsInHalfOpenState
+
+halfOpen상태에서 정상적인 상태로 갈 수 있는지 몇번까지 확인하는지 요청을 해볼지에 대한 설정
+
+![image](image/permittedNumberOfCallsInHalfOpenState.png)
+
+
+#### automaticTransitionFromOpenToHalfOpenEnabled
+
+open상태에서 waitDurationInOpenSate만큼 대기후 자동으로 상태를 halfopen상태로 만들지 아닐지에 대한 설정
+
+true일시 자동으로 halfopen으로 변경하고 false로 지정하면 요청이 한번 들어올때 
+
+waitDurationInOpenSate만큼 지났다면 Halfopen으로 변경후 요청처리
+
+![image](image/automaticTransitionFromOpenToHalfOpenEnabled.png)
+
+
+#### slowCallDurationThreshold
+
+느린 호출로 간주할 시간을 지정하는 설정 (느린요청으로 sliding window에 기록)
+
+#### slowCallRateThreshold
+
+실패율과 마찬가지로 느린호출이 몇 이상이 되면 서킷의 상태를 Open으로 할지에 대한 설정
