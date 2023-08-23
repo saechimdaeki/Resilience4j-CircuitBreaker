@@ -64,3 +64,35 @@ waitDurationInOpenSate만큼 지났다면 Halfopen으로 변경후 요청처리
 #### slowCallRateThreshold
 
 실패율과 마찬가지로 느린호출이 몇 이상이 되면 서킷의 상태를 Open으로 할지에 대한 설정
+
+
+
+----
+
+### 어떤 예외를 recordException으로 지정할까?
+
+recordException은 실패라고 간주하여 시스템을 회복시키기 위해 트래픽을 차단할 필요가 있는 상황에 던져지는 예외를 지정해야함.
+
+![image](image/recordException.png)
+
+즉, 보호하려는 대상에서 어떤 예외가 던져지는지 알아야함
+
+![image](image/boho.png)
+
+
+다만 주의해야할 점이 있다
+
+- 유효성 검사나 NullPointerException처럼 서킷이 열리는 것과 무관한 예외는 recordException로 등록 X
+- Exception이나 RuntimeException처럼 너무 높은 수준의 예외 역시 recordException로 등록 X
+
+
+`만약 라이브러리가 예외를 던져주지 않는다면?`
+
+![image](image/502bad.png)
+
+이런상황에서는 500번대의 에러라면 직접 예외를 던져주는 것이 좋다. (recordException으로 걸어서)
+
+`Slow Call에만 의존하지 말자`
+
+![image](image/slowCall.png)
+
