@@ -80,7 +80,7 @@ recordException은 실패라고 간주하여 시스템을 회복시키기 위해
 ![image](image/boho.png)
 
 
-다만 주의해야할 점이 있다
+#### `다만 주의해야할 점이 있다`
 
 - 유효성 검사나 NullPointerException처럼 서킷이 열리는 것과 무관한 예외는 recordException로 등록 X
 - Exception이나 RuntimeException처럼 너무 높은 수준의 예외 역시 recordException로 등록 X
@@ -96,3 +96,12 @@ recordException은 실패라고 간주하여 시스템을 회복시키기 위해
 
 ![image](image/slowCall.png)
 
+---
+
+### fallback 활용하기
+
+![image](image/fallback.png)
+
+`fallback Method로 할 수 있는 것`
+
+![image](image/canFallback.png)
